@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0"
+         DefaultTargets="Build;PublishWebsite;Harvest;Pack"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <!-- Wix Include parameters -->
+        <ProductName>MySite</ProductName>
+        <Manufacturer>Myself</Manufacturer>
+        <SourceDir>..\..\Publish</SourceDir>
+        <MainBin>MyWebSite.dll</MainBin>
+
+        <!-- Paths -->
+        <BuildSolution>.\MyWebSite.sln</BuildSolution>
+        <WebProject>.\MyWebSite\MyWebSite.csproj</WebProject>
+        <Publish>.\Publish\</Publish>
+        <CustomActions>.\Setup\SetupCustomActions\SetupCustomActions.csproj</CustomActions>
+        <SetupPath>.\Setup\Setup\</SetupPath>
+        <SetupProject>$(SetupPath)Setup.wixproj</SetupProject>
+        <Bootstrapper>.\Setup\Bootstrapper\</Bootstrapper>
+
+        <WixPath>"c:\program files (x86)\wix toolset v3.11\bin\"</WixPath>
+        <Configuration>Release</Configuration>
+
+        <!-- Using a string as XSL Content because the template@match attribute cannot contain variables,
+             thus is not possible to pass the MainBin property as an XSL parameter. -->
+        <GenerateWixIncludeXsl><![CDATA[
+<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:strip-space elements="*" />
+  <xsl:output method="xml" indent="yes"/>
+  <xsl:param name="ProductName"/>
+  <xsl:param name="Manufacturer"/>
+  <xsl:param name="SourceDir"/>
+
+  <xsl:template match="*[contains(@Source,'$(MainBin)')]">
+    <Include>
+      <xsl:text disable-output-escaping="yes">&#xA;  &lt;?define ProductName = "</xsl:text>
+      <xsl:value-of select='$ProductName'/>
+      <xsl:text disable-output-escaping="yes">" ?&gt;</xsl:text>
+
+      <xsl:text disable-output-escaping="yes">&#xA;  &lt;?define Manufacturer = "</xsl:text>
+      <xsl:value-of select='$Manufacturer'/>
+      <xsl:text disable-output-escaping="yes">" ?&gt;</xsl:text>
+
+      <xsl:text disable-output-escaping="yes">&#xA;  &lt;?define SourceDir = "</xsl:text>
+      <xsl:value-of select='$SourceDir'/>
+      <xsl:text disable-output-escaping="yes">" ?&gt;</xsl:text>
+
+      <xsl:value-of disable-output-escaping="yes"  select="concat('&#xA;  &lt;?define MainBinId = &quot;',@Id,'&quot; ?&gt;&#xA;')"/>
+
+      <xsl:text disable-output-escaping="yes">  &lt;?if %24(var.Platform) = x64 ?&gt;&#xA;    &lt;?define Win64 = "yes" ?&gt;&#xA;    &lt;?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?&gt;&#xA;  &lt;?else ?&gt;&#xA;    &lt;?define Win64 = "no" ?&gt;&#xA;    &lt;?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?&gt;&#xA;  &lt;?endif ?&gt;&#xA;</xsl:text>
+    </Include>
+  </xsl:template>
+
+</xsl:stylesheet>
+        ]]>
+        </GenerateWixIncludeXsl>
+    </PropertyGroup>
+
+    <Target Name="Build">
+        <MSBuild Projects="$(BuildSolution)"
+                 Targets="ReBuild"
+                 Properties="Configuration=$(Configuration)" />
+    </Target>
+
+    <Target Name="PublishWebsite">
+        <RemoveDir Directories="$(Publish)" ContinueOnError="false" />
+        <MSBuild Projects="$(WebProject)"
+                 Targets="_WPPCopyWebApplication"
+                 Properties="OutDir=.$(Publish)bin\;WebProjectOutputDir=.$(Publish);Configuration=$(Configuration)" />
+    </Target>
+
+    <Target Name="Harvest">
+        <Exec Command='$(WixPath)heat dir $(Publish) -dr INSTALLDIR -gg -g1 -cg DeployFiles -indent 2 -ke -sfrag -srd -var var.SourceDir -out tmp.wxs'
+              ContinueOnError="false"
+              WorkingDirectory="." />
+        <XslTransformation XmlInputPaths="tmp.wxs"
+                           XslContent="$(GenerateWixIncludeXsl)"
+                           OutputPaths="$(SetupPath)CustomVariables.wxi"
+                           Parameters="&lt;Parameter Name='ProductName' Value='$(ProductName)'/&gt;
+                                       &lt;Parameter Name='Manufacturer' Value='$(Manufacturer)'/&gt;
+                                       &lt;Parameter Name='SourceDir' Value='$(SourceDir)'/&gt;" />
+
+        <XslTransformation XmlInputPaths="tmp.wxs"
+                           XslInputPath="$(SetupPath)insertWixInclude.xsl"
+                           OutputPaths="$(SetupPath)DeployFiles.wxs"
+                           Parameters="&lt;Parameter Name='Configuration' Value='$(Configuration)' /&gt;"/>
+        <Delete Files="tmp.wxs" />
+    </Target>
+
+    <Target Name="Pack">
+        <MSBuild Projects="$(CustomActions)"
+                 Targets="ReBuild"
+                 Properties="Configuration=$(Configuration);Platform=AnyCPU" />        
+        <MSBuild Projects="$(SetupProject)"
+                 Targets="ReBuild"
+                 Properties="Configuration=$(Configuration)" />
+		<RemoveDir Directories="$(Publish)" ContinueOnError="false" />
+        <MSBuild Projects="$(Bootstrapper)Bootstrapper.vcxproj"
+                 Targets="ReBuild"
+                 Properties="Configuration=$(Configuration);ProjectDir=.;Platform=Win32" />
+    </Target>
+ </Project>

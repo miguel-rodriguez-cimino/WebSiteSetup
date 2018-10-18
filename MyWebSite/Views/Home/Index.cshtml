@@ -1,0 +1,25 @@
+﻿@model MyWebSite.Models.HomeModel
+@section Header
+{
+    <script type="text/javascript" src="~/Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.validate.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+}
+
+<div>
+    @if(Model == null)
+    { 
+        using (Html.BeginForm())
+        {
+            @Html.LabelFor(m => m.Name)<br />
+            @Html.TextBoxFor(m => m.Name)<br />
+            @Html.ValidationMessageFor(m => m.Name)<br />
+
+            <input type="submit" value="Submit"/>
+        }
+    }
+    else
+    {
+        <span>@ViewBag.Message @Model.Name</span>
+    }
+</div>

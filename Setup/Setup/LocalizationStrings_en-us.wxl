@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="AdminError" Overridable="yes">You need to be an administrator to install this product.</String>
+  <String Id="FrameworkError" Overridable="yes">This product requires the .NET Framework 4.5 installed.</String>
+  <String Id="ServerConfTitle" Overridable="yes">Server setup</String>
+  <String Id="ServerConfDesc" Overridable="yes">Please, set the server database configuration.</String>
+  <String Id="SkipDbConfiguration" Overridable="yes">Skip Database configuration</String>
+  <String Id="DBServerNameLabelText" Overridable="yes">Database server &amp;Name:</String>
+  <String Id="DBNameLabelText" Overridable="yes">Data&amp;base Name:</String>
+  <String Id="PwdLabelText" Overridable="yes">&amp;Password:</String>
+  <String Id="UserLabelText" Overridable="yes">&amp;User name:</String>
+  <String Id="cmdBack" Overridable="yes">Back</String>
+  <String Id="cmdNext" Overridable="yes">Next</String>
+  <String Id="cmdOK" Overridable="yes">OK</String>
+  <String Id="cmdCancel" Overridable="yes">Cancel</String>
+  <String Id="IisConfDesc" Overridable="yes">Select IIS Website.</String>
+  <String Id="SkipIISSetup" Overridable="yes">Skip IIS Configuration</String>
+  <String Id="IisWebSiteSelect" Overridable="yes">Web Site:</String>
+  <String Id="NewWebSiteName" Overridable="yes">Site Name:</String>
+  <String Id="NewWebSiteIp" Overridable="yes">IP Address:</String>
+  <String Id="NewWebSitePort" Overridable="yes">Port:</String>
+  <String Id="ErrorTextInvalidDatabase" Overridable="yes">Database connection failure. Verify the data is correct.</String>
+  <String Id="ServerConfDiagTitle" Overridable="yes">[ProductName] installation</String>
+  <String Id="SiteNameExists" Overridable="yes">The site name already exists.</String>
+  <String Id="SiteNameInvalid" Overridable="yes">The site name cannot be empty nor contain the following characters: \, /, ?, ;, :, @, &amp;, =, +, $, ,, |, \, ", &lt;, &gt;.</String>
+  <String Id="SitePortInvalid" Overridable="yes">Port number must be a value between 1 and 65535.</String>
+  <String Id="BindingInUse" Overridable="yes">The specified binding on [Address]:[Port] is aready in use by an existing site.</String>
+  <String Id="VirtualDirectoryExists" Overridable="yes">The selected site already contains a virtual directory with that name.</String>
+  <String Id="AuthMethodIntegratedText" Overridable="yes">Use &amp;Windows authentication</String>
+  <String Id="AuthMethodSQLText" Overridable="yes">Use &amp;SQL Server authentication</String>
+  <String Id="NewWebSiteLabel" Overridable="yes">[New Web Sitie]</String>
+  <String Id="SiteIpInvalid" Overridable="yes">Enter a valid IP address or use '*' to use all available addresses.</String>
+</WixLocalization>

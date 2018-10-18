@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="es-es" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="ServerConfDiagTitle" Overridable="yes">Instalación de [ProductName]</String>
+  <String Id="ServerConfTitle" Overridable="yes">Configuración del Servidor</String>
+  <String Id="ServerConfDesc" Overridable="yes">Por favor, configure la base de datos del servidor.</String>
+  <String Id="IisConfDesc" Overridable="yes">Seleccione el Sitio Web de IIS.</String>
+  <String Id="IisWebSiteSelect" Overridable="yes">Web Site:</String>
+  <String Id="NewWebSiteLabel" Overridable="yes">[Nuevo Sitio Web]</String>
+  <String Id="NewWebSiteName" Overridable="yes">Nombre del Sitio:</String>
+  <String Id="NewWebSiteIp" Overridable="yes">Dirección IP:</String>
+  <String Id="NewWebSitePort" Overridable="yes">Puerto:</String>
+  <String Id="SiteNameExists" Overridable="yes">El nombre del sitio web ya existe.</String>
+  <String Id="SiteNameInvalid" Overridable="yes">El nombre del sitio no puede estar vacio o contener los siguientes caracteres: \, /, ?, ;, :, @, &amp;, =, +, $, ,, |, \, ", &lt;, &gt;.</String>
+  <String Id="SiteIpInvalid" Overridable="yes">Introduzca una dirección IP válida o use '*' para indicar todas las direcciones disponibles.</String>
+  <String Id="SitePortInvalid" Overridable="yes">El puerto debe ser un valor entre 1 y 65535.</String>
+  <String Id="BindingInUse" Overridable="yes">El Binding especificado en [Dirección]:[Puerto] ya se encuentra en uso por un sitio existente.</String>
+  <String Id="VirtualDirectoryExists" Overridable="yes">El sitio web seleccionado ya contiene un directorio virtual con el nombre </String>
+  <String Id="SkipDbConfiguration" Overridable="yes">Omitir la configuraci&#243;n del a Base de Datos</String>
+  <String Id="SkipIISSetup" Overridable="yes">Omitir la configuraci&#243;n de IIS</String>
+  <String Id="DBServerNameLabelText" Overridable="yes">&amp;Nombre del servidor de Base de Datos:</String>
+  <String Id="DBNameLabelText" Overridable="yes">Nombre de la &amp;Base de Datos:</String>
+  <String Id="AuthMethodIntegratedText" Overridable="yes">Usar autenticación &amp;Windows</String>
+  <String Id="AuthMethodSQLText" Overridable="yes">Usar autenticación &amp;SQL Server</String>
+  <String Id="UserLabelText" Overridable="yes">Nombre de &amp;Usuario:</String>
+  <String Id="PwdLabelText" Overridable="yes">&amp;Password:</String>
+  <String Id="cmdNext" Overridable="yes">Siguiente</String>
+  <String Id="cmdBack" Overridable="yes">Anterior</String>
+  <String Id="cmdCancel" Overridable="yes">Cancelar</String>
+  <String Id="cmdOK" Overridable="yes">Aceptar</String>
+  <String Id="ErrorTextInvalidDatabase" Overridable="yes">Fallo al conectar a la base de datos. Verifique que los datos son correctos.</String>
+  <String Id="DowngradeError" Overridable="yes">Una versión mas reciente de [ProductName] ya se encuentra instalada.</String>
+  <String Id="AdminError" Overridable="yes">Necesita permisos de administrador para instalar este producto.</String>
+  <String Id="FrameworkError" Overridable="yes">Este producto requiere la instalacion del Framework .NET 4.5.</String>
+
+  <!--IIS and XML Extension Localization-->
+  <!-- As of WIX version 3.9 some extensions were not localized to spanish, so these strings had to be incluede here manually-->
+  <String Id="msierrXmlFileFailedRead" Overridable="yes">Hubo un error al configurar los archivos XML.</String>
+  <String Id="msierrXmlFileFailedOpen" Overridable="yes">Error al abrir archivo XML [3], error de sistema: [2]</String>
+  <String Id="msierrXmlFileFailedSelect" Overridable="yes">No se encontró el nodo: [3] en archivo XML: [4], error de sistema: [2]</String>
+  <String Id="msierrXmlFileFailedSave" Overridable="yes">Error al guardar cambios en el archivo XML [3], error de sistema: [2]</String>
+  
+  <String Id="msierrIISCannotConnect" Overridable="yes">Imposible connectarse a Internet Information Server.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadWebSite" Overridable="yes">Fallo procesando WebSites.   ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadWebDirs" Overridable="yes">Fallo procesando WebDirs.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadVDirs" Overridable="yes">Fallo procesando WebVirtualDirs.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadFilters" Overridable="yes">Fallo procesando WebFilters.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadMimeMap" Overridable="yes">Fallo procesando MimeMaps. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadAppPool" Overridable="yes">Fallo procesando WebAppPools. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadProp" Overridable="yes">Fallo procesando WebProperties. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadWebSvcExt" Overridable="yes">Fallo procesando WebServiceExtensions. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadWebError" Overridable="yes">Fallo procesando WebErrors. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedReadHttpHeader" Overridable="yes">Fallo procesando HttpHeaders. ([2]   [3]   [4]   [5])</String>
+
+  <String Id="msierrIISFailedSchedTransaction" Overridable="yes">Fallo al programar transacciones para cambios en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallWebs" Overridable="yes">Fallo al programar instalación de Web Sites en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallWebDirs" Overridable="yes">Fallo al programar instalación de Directorios Web en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallVDirs" Overridable="yes">Fallo al programar instalación de Directorios Virtuales en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallFilters" Overridable="yes">Fallo al programar instalación de Filtros en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallAppPool" Overridable="yes">Fallo al programar instalación de AppPools en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallProp" Overridable="yes">Fallo al programar instalación de Propiedades en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedInstallWebSvcExt" Overridable="yes">Fallo al programar instalación de Extensiones de Servicios Web en IIS.  ([2]   [3]   [4]   [5])</String>
+
+  <String Id="msierrIISFailedSchedUninstallWebs" Overridable="yes">Fallo al programar desinstalación de Web Sites en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallWebDirs" Overridable="yes">Fallo al programar desinstalación de Directorios Web en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallVDirs" Overridable="yes">Fallo al programar desinstalación de Directorios Virtuales en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallFilters" Overridable="yes">Fallo al programar desinstalación de Filtros en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallAppPool" Overridable="yes">Fallo al programar desinstalación de AppPools en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallProp" Overridable="yes">Fallo al programar desinstalación de Propiedades en IIS.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedSchedUninstallWebSvcExt" Overridable="yes">Fallo al programar desinstalación de Extensiones de Servicios Web en IIS.  ([2]   [3]   [4]   [5])</String>
+
+  <String Id="msierrIISFailedStartTransaction" Overridable="yes">Fallo al iniciar transacción IIS. ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedOpenKey" Overridable="yes">Fallo al abrir clave de metabase.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedCreateKey" Overridable="yes">Fallo al crear clave de metabase.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedWriteData" Overridable="yes">Fallo al escribir datos en clave de metabase.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedCreateApp" Overridable="yes">Fallo al crear web application.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedDeleteKey" Overridable="yes">Fallo al borrar clave de metabase.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedDeleteValue" Overridable="yes">Fallo al borrar valor de metabase.  ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrIISFailedCommitInUse" Overridable="yes">Fallo al grabar transaccion IIS debido a una violación de recurso compartido. Alguna otra aplicación puede estar configurando IIS.</String>
+
+  <String Id="ConfigureIIs" Overridable="yes">Configurando IIS</String>
+  <String Id="ConfigureIIsExec" Overridable="yes">Ejecutando Configuración de IIS</String>
+  <String Id="StartMetabaseTransaction" Overridable="yes">Iniciando Transacción de Metabase IIS</String>
+  <String Id="RollbackMetabaseTransaction" Overridable="yes">Cancelando Transacción de Metabase IIS</String>
+  <String Id="CommitMetabaseTransaction" Overridable="yes">Grabando Transacción de Metabase IIS</String>
+  <String Id="WriteMetabaseChanges" Overridable="yes">Instalando Claves y Valores de Metabase</String>
+
+  <String Id="ConfigureIIs7Exec" Overridable="yes">Configurando IIS</String>
+  <String Id="StartIIS7ConfigTransaction" Overridable="yes">Iniciando Transacción de Configuración IIS</String>
+  <String Id="RollbackIIS7ConfigTransaction" Overridable="yes">Cancelando Transacción de Configuración IIS</String>
+  <String Id="CommitIIS7ConfigTransaction" Overridable="yes">Grabando Transacción de Configuración IIS</String>
+  <String Id="WriteIIS7ConfigChanges" Overridable="yes">Instalando Claves y Valores de Metabase</String>
+</WixLocalization>

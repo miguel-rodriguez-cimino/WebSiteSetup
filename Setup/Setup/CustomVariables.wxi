@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define ProductName = "MySite" ?>
+  <?define Manufacturer = "Myself" ?>
+  <?define SourceDir = "..\..\MyWebSite" ?>
+  <?define MainBinId = "filA46D6545281AB75B69CCE1B3A988A93B" ?>
+  <?if $(var.Platform) = x64 ?>
+    <?define Win64 = "yes" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+    <?define Win64 = "no" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+</Include>

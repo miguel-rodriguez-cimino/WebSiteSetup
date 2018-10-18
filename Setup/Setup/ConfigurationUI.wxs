@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <EnsureTable Id="ComboBox"/>
+    
+    <UI>
+      <!--Database Configuration-->
+      <Dialog Id="DatabaseConfigurationDlg" Width ="370" Height ="270" Title="!(loc.ServerConfDiagTitle)">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}!(loc.ServerConfTitle)</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>!(loc.ServerConfDesc)</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+        <Control Id="SkipDBCheck" Type="CheckBox" X="45" Y="48" Width="200" Height="15" TabSkip="no" Property="SKIPDB" CheckBoxValue="1" Text="!(loc.SkipDbConfiguration)" />
+        <Control Id="DBServerNameLabel" Type="Text" X="45" Y="66" Width="200" Height="15" TabSkip="no" Text="!(loc.DBServerNameLabelText)" />
+        <Control Id="DBServerNameEdit" Type="Edit" X="45" Y="78" Width="220" Height="18" Property="DBSERVERNAME" Text="{80}">
+          <Condition Action="disable">SKIPDB = "1"</Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB <> "1"]]></Condition>
+        </Control>
+        <Control Id="DBNameLabel" Type="Text" X="45" Y="98" Width="200" Height="15" TabSkip="no" Text="!(loc.DBNameLabelText)" />
+        <Control Id="DBNameEdit" Type="Edit" X="45" Y="110" Width="220" Height="18" Property="DBNAME" Text="{80}">
+          <Condition Action="disable">SKIPDB = "1"</Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB <> "1"]]></Condition>
+        </Control>
+        <Control Id="AuthMethod" Type="RadioButtonGroup" X="45" Y="133" Width="305" Height="30" Property="AUTHMETHOD" Text=" ">
+          <RadioButtonGroup Property="AUTHMETHOD">
+            <RadioButton Value="1" X="0" Y="0" Width="200" Height="10" Text="!(loc.AuthMethodIntegratedText)" />
+            <RadioButton Value="2" X="0" Y="15" Width="200" Height="10" Text="!(loc.AuthMethodSQLText)" />
+          </RadioButtonGroup>
+          <Condition Action="disable">SKIPDB = "1"</Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB <> "1"]]></Condition>
+        </Control>
+        <Control Id="UserLabel" Type="Text" X="45" Y="164" Width="100" Height="15" TabSkip="no" Text="!(loc.UserLabelText)" />
+        <Control Id="UserEdit"  Type="Edit" X="45" Y="176" Width="220" Height="18" Property="DBUSR" Text="{80}">
+          <Condition Action="disable"><![CDATA[SKIPDB = "1" OR AUTHMETHOD <> "2"]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB <> "1" AND AUTHMETHOD = "2"]]></Condition>
+        </Control>
+        <Control Id="PwdLabel"  Type="Text" X="45" Y="196" Width="100" Height="15" TabSkip="no" Text="!(loc.PwdLabelText)" />
+        <Control Id="PwdEdit"   Type="Edit" X="45" Y="206" Width="220" Height="18" Property="DBPWD" Text="{80}" Password="yes">
+          <Condition Action="disable"><![CDATA[SKIPDB = "1" OR AUTHMETHOD <> "2"]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB <> "1" AND AUTHMETHOD = "2"]]></Condition>
+        </Control>
+
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.cmdBack)">
+          <Publish Event="NewDialog" Value="InstallDirDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.cmdNext)">
+          <Condition Action="disable"><![CDATA[SKIPDB <> "1" AND NOT (DBSERVERNAME <> "" AND DBNAME <> "" AND (AUTHMETHOD = "1" OR (DBUSR <> "" AND DBPWD <> "")))]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPDB = "1" OR DBSERVERNAME <> "" AND DBNAME <> "" AND (AUTHMETHOD = "1" OR (DBUSR <> "" AND DBPWD <> ""))]]></Condition>
+          <Publish Order="1" Event="DoAction" Value="CheckDB"><![CDATA[SKIPDB <> 1 AND DBSERVERNAME <> "" AND DBNAME <> "" AND (AUTHMETHOD = "1" OR (DBUSR <> "" AND DBPWD <> ""))]]></Publish>
+          <Publish Order="2" Property="ERRORMSG" Value="!(loc.ErrorTextInvalidDatabase)"><![CDATA[SKIPDB <> "1" AND DBCONNECTIONSUCCESS = 0]]></Publish>
+          <Publish Order="3" Event="SpawnDialog" Value="ValidateErrorDlg"><![CDATA[SKIPDB <> "1" AND DBCONNECTIONSUCCESS = 0]]></Publish>
+          <Publish Order="4" Event="DoAction" Value="LoadWebSites"><![CDATA[SKIPDB = "1" OR DBCONNECTIONSUCCESS = 1]]></Publish>
+          <Publish Order="5" Event="NewDialog" Value="IisConfigurationDlg"><![CDATA[SKIPDB = "1" OR DBCONNECTIONSUCCESS = 1]]></Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.cmdCancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!--IIS Configuration-->
+      <Property Id="NEWWEBSITE" Value="!(loc.NewWebSiteLabel)"/>
+      <Property Id="IISSITENAMEEXISTS" Value="!(loc.SiteNameExists)"/>
+      <Property Id="IISSITENAMEINVALID" Value="!(loc.SiteNameInvalid)"/>
+      <Property Id="IISIPINVALID" Value="!(loc.SiteIpInvalid)"/>
+      <Property Id="IISPORTINVALID" Value="!(loc.SitePortInvalid)"/>
+      <Property Id="IISBINDINGINUSE" Value="!(loc.BindingInUse)"/>
+      <Property Id="VIRTUALDIREXISTS" Value="!(loc.VirtualDirectoryExists)"/>
+
+      <Dialog Id="IisConfigurationDlg" Width ="370" Height ="270" Title="!(loc.ServerConfDiagTitle)">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}!(loc.ServerConfTitle)</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>!(loc.IisConfDesc)</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+        <Control Id="SkipIISSetup" Type="CheckBox" X="45" Y="48" Width="200" Height="15" TabSkip="no" Property="SKIPIIS" CheckBoxValue="1" Text="!(loc.SkipIISSetup)">
+          <Condition Action="disable">CANNOTSETIIS = "1"</Condition>
+          <Condition Action="enable"><![CDATA[CANNOTSETIIS <> "1"]]></Condition>
+        </Control>
+        <Control Id="IisWebSiteLabel" Type="Text" X="45" Y="66" Width="200" Height="15" TabSkip="no" Text="!(loc.IisWebSiteSelect)" />
+        <Control Id="IisWebSiteCombo" Type="ComboBox" X="45" Y ="78" Width="220" Height="18" Property="IISWEBSITE" ComboList="yes" Sorted="yes">
+          <ComboBox Property="IISWEBSITE">
+            <ListItem Text="[NEWWEBSITE]" Value="@NEW" />
+          </ComboBox>
+          <Condition Action="disable">SKIPIIS = "1"</Condition>
+          <Condition Action="enable"><![CDATA[SKIPIIS <> "1"]]></Condition>
+        </Control>
+        <Control Id="WebSiteNameLabel" Type="Text" X="45" Y="98" Width="100" Height="15" TabSkip="no" Text="!(loc.NewWebSiteName)"/>
+        <Control Id="WebSiteNameEdit" Type="Edit" X="45" Y="110" Width="220" Height="18" Property="SITENAME" Text="{30}">
+          <Condition Action="disable"><![CDATA[SKIPIIS = "1" OR IISWEBSITE <> "@NEW"]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPIIS <> "1" AND IISWEBSITE = "@NEW"]]></Condition>
+        </Control>
+        <Control Id="WebSiteIpLabel" Type="Text" X="45" Y="130" Width="100" Height="15" TabSkip="no" Text="!(loc.NewWebSiteIp)"/>
+        <Control Id="WebSiteIpEdit" Type="Edit" X="45" Y="142" Width="220" Height="18" Property="SITEIP">
+          <Condition Action="disable"><![CDATA[SKIPIIS = "1" OR IISWEBSITE <> "@NEW"]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPIIS <> "1" AND IISWEBSITE = "@NEW"]]></Condition>
+        </Control>
+        <Control Id="WebSitePortLabel" Type="Text" X="45" Y="162" Width="100" Height="15" TabSkip="no" Text="!(loc.NewWebSitePort)"/>
+        <Control Id="WebSitePortEdit" Type="MaskedEdit" X="45" Y="174" Width="30" Height="18" Property="SITEPORT" Text="#####" Sunken="yes">
+          <Condition Action="disable"><![CDATA[SKIPIIS = "1" OR IISWEBSITE <> "@NEW"]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPIIS <> "1" AND IISWEBSITE = "@NEW"]]></Condition>
+        </Control>
+
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.cmdBack)">
+          <Publish Event="NewDialog" Value="DatabaseConfigurationDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.cmdNext)">
+          <Condition Action="disable"><![CDATA[SKIPIIS <> "1" AND (IISWEBSITE = "@NEW" AND SITENAME = "" AND SITEIP = "" AND SITEPORT = "" AND SITEPATH = "")]]></Condition>
+          <Condition Action="enable"><![CDATA[SKIPIIS = "1" OR IISWEBSITE <> "@NEW" OR (SITENAME <> "" AND SITEIP <> "" AND SITEPORT <> "" AND SITEPATH <> "")]]></Condition>
+          <Publish Order="1" Event="DoAction" Value="CheckIis"><![CDATA[(SKIPIIS <> "1" AND IISWEBSITE <> "@NEW") OR (SKIPIIS <> "1" AND SITENAME <> "" AND SITEIP <> "" AND SITEPORT <> "" AND SITEPATH <> "")]]></Publish>
+          <Publish Order="2" Property="ERRORMSG" Value="[IISERRORMSG]"><![CDATA[SKIPIIS <> "1" AND IISSUCCESS = 0]]></Publish>
+          <Publish Order="3" Event="SpawnDialog" Value="ValidateErrorDlg"><![CDATA[SKIPIIS <> "1" AND IISSUCCESS = 0]]></Publish>
+          <Publish Order="4" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[SKIPIIS = "1" OR IISSUCCESS = 1]]></Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.cmdCancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!--Error dialog-->
+      <Dialog Id="ValidateErrorDlg" Width="250" Height="85" Title="!(loc.ErrorDlg_Title)">
+        <Control Id="ErrorText" Type="Text" X="48" Y="15" Width="200" Height="60" TabSkip="no" NoPrefix="yes" Text="[ERRORMSG]" />
+        <Control Id="ErrorIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+        <Control Id="R" Type="PushButton" X="100" Y="60" Width="56" Height="17" TabSkip="yes" Text="!(loc.cmdOK)">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+      </Dialog>
+    </UI>
+  </Fragment>
+</Wix>

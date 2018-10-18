@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?include $(sys.CURRENTDIR)\CustomVariables.wxi?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+  <Product Name="$(var.ProductName)"
+           Manufacturer="$(var.Manufacturer)"
+           Language="1033"
+           Version="!(bind.FileVersion.$(var.MainBinId))"
+           Id="*"
+           UpgradeCode="F666AF11-9AE0-4B9F-90B3-6EB2E770A7DE">
+    <Package Id="*"
+             Keywords="Installer"
+             Description="Instalador"
+             InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"/>
+
+    <Upgrade Id="F666AF11-9AE0-4B9F-90B3-6EB2E770A7DE">
+      <UpgradeVersion Minimum="0.0.1"
+                IncludeMinimum="yes"
+                OnlyDetect="no"
+                Maximum="!(bind.FileVersion.$(var.MainBinId))"
+                IncludeMaximum="no"
+                Property="PREVIOUSFOUND" />
+    </Upgrade>
+
+    <Media Id="1" Cabinet="Setup.cab" EmbedCab="yes"/>
+
+    <!-- Icon -->
+    <Icon Id="icon.ico" SourceFile="..\Bootstrapper\bootstrapper.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+    <!--Launch conditions-->
+    <Condition Message="!(loc.AdminError)">
+      Privileged
+    </Condition>
+
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <Condition Message='!(loc.FrameworkError)'>
+      <![CDATA[Installed OR NETFRAMEWORK45]]>
+    </Condition>
+
+    <!-- Default values for properties-->
+    <Property Id="INSTALLLEVEL" Value="1"/>
+    <Property Id="AUTHMETHOD" Value="1"/>
+    <Property Id="DBCONNECTIONSUCCESS" Value="0"/>
+    <Property Id="IISSUCCESS" Value="0"/>
+    <Property Id="IISWEBSITE" Value="@NEW" Secure="yes"/>
+    <Property Id="SITEID" Value="0" Secure="yes">
+      <RegistrySearch Id="SiteId" Root="HKLM" Key="Software\[ProductName]" Name="SiteId" Type="raw"/>
+    </Property>
+    <Property Id="VIRTUALDIRECTORY" Value="$(var.ProductName)" Secure="yes">
+      <RegistrySearch Id="SiteVDir" Root="HKLM" Key="Software\[ProductName]" Name="SiteVDir" Type="raw"/>
+    </Property>
+    <Property Id="SITENAME" Secure="yes">
+      <RegistrySearch Id="SiteName" Root="HKLM" Key="Software\[ProductName]" Name="SiteName" Type="raw"/>
+    </Property>
+    <Property Id="SITEIP" Secure="yes">
+      <RegistrySearch Id="SiteIp" Root="HKLM" Key="Software\[ProductName]" Name="SiteIp" Type="raw"/>
+    </Property>
+    <Property Id="SITEPORT" Secure="yes">
+      <RegistrySearch Id="SitePort" Root="HKLM" Key="Software\[ProductName]" Name="SitePort" Type="raw"/>
+    </Property>
+
+    <SetProperty Id="OLDSITENAME" Value="[SITENAME]" After="CostFinalize"/>
+    <SetProperty Id="OLDIP" Value="[SITEIP]" After="CostFinalize"/>
+    <SetProperty Id="OLDPORT" Value="[SITEPORT]" After="CostFinalize"/>
+    <SetProperty Id="OLDVDIR" Value="[VIRTUALDIRECTORY]" After="CostFinalize"/>
+
+    <!--UI-->
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <WixVariable Id="WixUILicenseRtf" Value=".\License.rtf"/>
+
+    <UI Id="CustomWebSiteUI">
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="DatabaseConfigurationDlg" Order="4">NOT Installed AND NOT PATCH AND (WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1")</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="5">Installed AND (WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1")</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="IisConfigurationDlg" Order="1">NOT Installed</Publish>
+    </UI>
+
+    <!--DB Configuration-->
+    <SetProperty Id="DBConnectionString" Action ="SetDBConnectionStringInt" Value="Data Source=[DBSERVERNAME];Initial Catalog=[DBNAME];Integrated Security=True" After="CostFinalize">AUTHMETHOD = 1</SetProperty>
+    <SetProperty Id="DBConnectionString" Action ="SetDBConnectionStringSQL" Value="Data Source=[DBSERVERNAME];Initial Catalog=[DBNAME];User ID=[DBUSR];Password=[DBPWD]" After="CostFinalize">AUTHMETHOD = 2</SetProperty>
+    
+    <Component Id="WebConfigWrite" Guid="41744B5F-B242-40A9-954E-5CCB6E40FAEC" KeyPath="yes" Directory="INSTALLDIR">
+      <Condition><![CDATA[SKIPDB <> "1"]]></Condition>
+      <util:XmlFile Id="SetDatabase" Action="setValue" File="[INSTALLDIR]\Web.config" ElementPath="/configuration/connectionStrings/add[\[]@name='DatabaseConnection'[\]]" Name="connectionString" Value="[DBConnectionString]" />
+    </Component>
+    <Component Id ="WebConfigWriteNoDb" Guid="528A749D-7EE6-40B2-B1B7-913ADAE92359" KeyPath="yes" Directory="INSTALLDIR">
+      <Condition>SKIPDB = "1"</Condition>
+      <util:XmlConfig Id="ClearDatabase" On="install" Action="delete" Node="element" File="[INSTALLDIR]\Web.config" VerifyPath="/configuration/connectionStrings/add[\[]@name='DatabaseConnection'[\]]" ElementPath="/configuration/connectionStrings" Sequence="1"/>
+    </Component>
+
+    <!--Web Site Configuration-->
+    <iis:WebSite Id="ExistingWebSite" Description="[IISWEBSITE]" SiteId="[SITEID]">
+      <iis:WebAddress Id="IisExistingWebAddress" Port="80" />
+    </iis:WebSite>
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="AppPoolComponent" KeyPath="yes" Guid="75B4D4AB-B4A8-4C6E-B1A8-31714899ABDD">
+        <Condition><![CDATA[SKIPIIS <> "1"]]></Condition>
+        <iis:WebAppPool Id="IisApplicationPool" Name="$(var.ProductName)" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" Identity="applicationPoolIdentity"/>
+      </Component>
+
+      <Component Id="IisNewSiteDeploy" KeyPath="yes" Guid="4C1DAACB-B207-4632-B079-A8852878CC50" >
+        <Condition><![CDATA[SKIPIIS <> "1" AND IISWEBSITE = "@NEW"]]></Condition>
+        <RegistryValue Root="HKLM" Key="Software\[ProductName]" Name="SiteName" Type="string" Value="[SITENAME]" />
+        <RegistryValue Root="HKLM" Key="Software\[ProductName]" Name="SiteIp" Type="string" Value="[SITEIP]" />
+        <RegistryValue Root="HKLM" Key="Software\[ProductName]" Name="SitePort" Type="string" Value="[SITEPORT]" />
+        <iis:WebSite Id="NewWebSite" Description="[SITENAME]" Directory="INSTALLDIR">
+          <iis:WebAddress Id="IisNewWebAddress" IP="[SITEIP]" Port="[SITEPORT]" />
+          <iis:WebApplication Id="NewSiteApplication" Name="$(var.ProductName)" WebAppPool="IisApplicationPool"/>
+        </iis:WebSite>
+      </Component>
+
+      <Component Id="IisExistingSiteDeploy" KeyPath="yes" Guid="5078FF0C-74FD-4847-A5A7-E85B6467E2C2">
+        <Condition><![CDATA[SKIPIIS <> "1" AND IISWEBSITE <> "@NEW"]]></Condition>
+        <RegistryValue Root="HKLM" Key="Software\[ProductName]" Name="SiteVDir" Type="string" Value="[VIRTUALDIRECTORY]" />
+        <RegistryValue Root="HKLM" Key="Software\[ProductName]" Name="SiteId" Type="string" Value="[SITEID]" />
+        <iis:WebVirtualDir Id="ExistingSiteVirtualDir" Alias="[VIRTUALDIRECTORY]" Directory="INSTALLDIR" WebSite="ExistingWebSite">
+          <iis:WebApplication Id="ExistingSiteApplication" Name="$(var.ProductName)" WebAppPool="IisApplicationPool"/>
+        </iis:WebVirtualDir>
+        <util:XmlFile Id="SetError400" Action="setValue" File="[INSTALLDIR]\Web.config" ElementPath="/configuration/system.webServer/httpErrors/error[\[]@statusCode='400'[\]]" Name="path" Value="/[VIRTUALDIRECTORY]/Home/Error/400" />
+        <util:XmlFile Id="SetError403" Action="setValue" File="[INSTALLDIR]\Web.config" ElementPath="/configuration/system.webServer/httpErrors/error[\[]@statusCode='403'[\]]" Name="path" Value="/[VIRTUALDIRECTORY]/Home/Error/403" />
+        <util:XmlFile Id="SetError404" Action="setValue" File="[INSTALLDIR]\Web.config" ElementPath="/configuration/system.webServer/httpErrors/error[\[]@statusCode='404'[\]]" Name="path" Value="/[VIRTUALDIRECTORY]/Home/Error/404" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="SITEPATH" Name="inetpub">
+        <Directory Id="wwwrootDir" Name="wwwroot">
+          <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Features -->
+    <Feature Id="Product" Title="Setup" Level="1" Absent="disallow" ConfigurableDirectory="INSTALLDIR">
+      <ComponentGroupRef Id="DeployFiles"/>
+      <ComponentRef Id="WebConfigWrite"/>
+      <ComponentRef Id="WebConfigWriteNoDb"/>
+      <ComponentRef Id="IisNewSiteDeploy"/>
+      <ComponentRef Id="IisExistingSiteDeploy"/>
+      <ComponentRef Id="AppPoolComponent"/>
+    </Feature>
+
+    <!--Install sequence-->
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize"/>
+    </InstallExecuteSequence>
+
+    <!--Custom Actions-->
+    <Binary Id="CustomActionsBinnary" SourceFile="..\SetupCustomActions\bin\SetupCustomActions.CA.dll"/>
+    <Binary Id="CustomActionsDependency" SourceFile="..\SetupCustomActions\bin\Microsoft.Web.Administration.dll"/>
+    <CustomAction Id="LoadWebSites" BinaryKey="CustomActionsBinnary" DllEntry="LoadWebSites" />
+    <CustomAction Id="CheckDB" BinaryKey="CustomActionsBinnary" DllEntry="CheckDatabase"/>
+    <CustomAction Id="CheckIis" BinaryKey="CustomActionsBinnary" DllEntry="CheckIis"/>
+  </Product>
+</Wix>

@@ -25,7 +25,7 @@
                 Property="PREVIOUSFOUND" />
     </Upgrade>
 
-    <Media Id="1" Cabinet="Setup.cab" EmbedCab="yes"/>
+    <MediaTemplate EmbedCab="yes"/>
 
     <!-- Icon -->
     <Icon Id="icon.ico" SourceFile="..\Bootstrapper\bootstrapper.ico"/>

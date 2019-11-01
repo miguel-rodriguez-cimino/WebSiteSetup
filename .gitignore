@@ -18,7 +18,7 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
-Output/
+[Oo]utput/
 .vs/
 artifacts/
 wwwroot/lib/
@@ -166,3 +166,4 @@ Desktop.ini
 
 ## Sonar
 .sonar/
+.sonarqube/

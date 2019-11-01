@@ -69,7 +69,7 @@
         <RemoveDir Directories="$(Publish)" ContinueOnError="false" />
         <MSBuild Projects="$(WebProject)"
                  Targets="_WPPCopyWebApplication"
-                 Properties="OutDir=.$(Publish)bin\;WebProjectOutputDir=.$(Publish);Configuration=$(Configuration)" />
+                 Properties="WebProjectOutputDir=.$(Publish);Configuration=$(Configuration)" />
     </Target>
 
     <Target Name="Harvest">
